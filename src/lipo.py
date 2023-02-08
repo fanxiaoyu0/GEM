@@ -180,7 +180,7 @@ class ADMET(nn.Layer):
         super(ADMET, self).__init__()
         compound_encoder_config = json.load(open('../lib/PaddleHelix/apps/pretrained_compound/ChemRL/GEM/model_configs/geognn_l8.json', 'r'))
         self.encoder = GeoGNNModel(compound_encoder_config)
-        self.encoder.set_state_dict(pdl.load("../lib/PaddleHelix/apps/pretrained_compound/ChemRL/GEM/weight/regr.pdparams"))
+        self.encoder.set_state_dict(pdl.load("../weight/PaddleHelix/pretrain_models-chemrl_gem/regr.pdparams"))
         self.mlp = nn.Sequential(
             nn.Linear(32, 32),
             nn.ReLU(),
@@ -260,10 +260,26 @@ def trial(model_version):
         if epoch > current_best_epoch + max_bearable_epoch:
             break
 
+def test(model_version):
+    data_loader_train, data_loader_validate, data_loader_test = get_data_loader(batch_size=256)
+
+    model = ADMET()
+    model.set_state_dict(pdl.load("../weight/lipo/" + model_version + ".pkl"))
+    model.eval()
+
+    metric_train = evaluate(model, data_loader_train)
+    metric_validate = evaluate(model, data_loader_validate)
+    metric_test = evaluate(model, data_loader_test)
+
+    print("Train", metric_train)
+    print("Validate", metric_validate)
+    print("Test", metric_test)
+
 if __name__ == '__main__':
     # get_smiles_list_pkl()
     # calculate_3D_structure()
     # construct_data_list()
     trial(model_version='1')
+    # test(model_version='1')
     print("All is well!")
 

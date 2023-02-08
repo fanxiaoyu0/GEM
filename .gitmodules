@@ -1,0 +1,3 @@
+[submodule "lib/PaddleHelix"]
+	path = lib/PaddleHelix
+	url = git@github.com:PaddlePaddle/PaddleHelix.git
